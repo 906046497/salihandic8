@@ -43,7 +43,7 @@ int ept_demo(void)
 //------------------------------------------------------------------------------------------------------------------------	
 	csi_ept_config_t tPwmCfg;								  
 	tPwmCfg.byWorkmod       = EPT_WAVE;                        //WAVE or CAPTURE    //计数或捕获	
-	tPwmCfg.byCountingMode  = EPT_UPCNT;                       //CNYMD  //计数方向
+	tPwmCfg.byCountingMode  = EPT_UPDNCNT;                       //CNYMD  //计数方向
 	tPwmCfg.byOneshotMode   = EPT_OP_CONT;                     //OPM    //单次或连续(工作方式)
 	tPwmCfg.byStartSrc      = EPT_SYNC_START;				   //软件使能同步触发使能控制（RSSR中START控制位）//启动方式
 	tPwmCfg.byPscld         = EPT_LDPSCR_ZRO;                  //PSCR(分频)活动寄存器载入控制。活动寄存器在配置条件满足时，从影子寄存器载入更新值
@@ -69,7 +69,7 @@ int ept_demo(void)
 	tPwmCfg.byCgsrc   = EPT_CGSRC_TIOA;                           //CHAX作为CG的输入源
 	tPwmCfg.byCgflt   = EPT_CGFLT_2;                              //门控输入数字滤波控制
 		
-	tPwmCfg.byInter 		 = EPT_INT_TRGEV0;                      //interrupt
+	tPwmCfg.byInter 		 = EPT_INT_TRGEV0;                    //interrupt
 	csi_ept_config_init(EPT0, &tPwmCfg);
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -100,11 +100,11 @@ int ept_demo(void)
 	csi_ept_deadzone_config_t  tEptDeadZoneTime;
 	tEptDeadZoneTime.byDcksel               = EPT_DB_DPSC;     //
 	tEptDeadZoneTime.hwDpsc                 =  0;              //FDBCLK = FHCLK / (DPSC+1)
-	tEptDeadZoneTime.hwRisingEdgereGister = 24;                //NS/(1/(48000000/(DPSC+1))*10^9) // 500NS/(1000/48) = 24;
-	tEptDeadZoneTime.hwFallingEdgereGister= 24;                //下降沿
-	tEptDeadZoneTime.byChaDedb             = DB_AR_BF;         //不使用死区双沿
-	tEptDeadZoneTime.byChbDedb             = DB_AR_BF;
-	tEptDeadZoneTime.byChcDedb             = DB_AR_BF;
+	tEptDeadZoneTime.hwRisingEdgereGister   = 500;              //NS/(1/(48000000/(DPSC+1))*10^9) // 500NS/(1000/48) = 24;
+	tEptDeadZoneTime.hwFallingEdgereGister  = 500;              //下降沿
+	tEptDeadZoneTime.byChaDedb              = DB_AR_BF;        //不使用死区双沿
+	tEptDeadZoneTime.byChbDedb              = DB_AR_BF;
+	tEptDeadZoneTime.byChcDedb              = DB_AR_BF;
 	csi_ept_dbcr_config(EPT0,&tEptDeadZoneTime);
 	
 	tEptDeadZoneTime.byChxOuselS1S0      = E_DBOUT_AR_BF;      //使能通道A的上升沿延时，使能通道B的下降沿延时
@@ -171,7 +171,7 @@ int ept_demo(void)
 					csp_ept_clr_emHdlck(EPT0,EP1);
 				}
 //            csp_ept_evtrg_soft(EPT0,0);			
-//		    csi_ept_change_ch_duty(EPT0,EPT_CH_A, 25);		      
+		    csi_ept_change_ch_duty(EPT0,EPT_CH_A, 100);		      
 		    mdelay(200);                        
 			//csi_ept_Continuous_software_waveform(EPT0,EPT_CHANNEL_A,EM_AQCSF_L);//
 			//mdelay(200);
@@ -270,12 +270,12 @@ int ept_demo12(void)
 //------------------------------------------------------------------------------------------------------------------------		
 csi_ept_pwmconfig_t tPwmCfg;								  
 	tPwmCfg.byWorkmod        = EPT_WAVE;                        //WAVE  波形模式
-	tPwmCfg.byCountingMode   = EPT_UPDNCNT;                       //CNYMD  //计数方向
+	tPwmCfg.byCountingMode   = EPT_DNCNT;                       //CNYMD  //计数方向
 	tPwmCfg.byOneshotMode    = EPT_OP_CONT;                     //OPM    //单次或连续(工作方式)
 	tPwmCfg.byStartSrc       = EPT_SYNC_START;					//软件使能同步触发使能控制（RSSR中START控制位）//启动方式
 	tPwmCfg.byPscld          = EPT_LDPSCR_ZRO;                  //PSCR(分频)活动寄存器载入控制。活动寄存器在配置条件满足时，从影子寄存器载入更新值		
 	tPwmCfg.byDutyCycle 	 = 50;								//pwm ouput duty cycle//PWM初始值			
-	tPwmCfg.wFreq 			 = 150;							//pwm ouput frequency	
+	tPwmCfg.wFreq 			 = 150;							    //pwm ouput frequency	
     
 	tPwmCfg.byInter 		 = EPTINT_PEND;                     //interrupt
 	csi_ept_wave_init(EPT0, &tPwmCfg);
@@ -284,9 +284,9 @@ csi_ept_pwmconfig_t tPwmCfg;
 //------------------------------------------------------------------------------------------------------------------------	
 	csi_ept_pwmchannel_config_t  channel;
 	channel.byActionZro    =   LO;
-	channel.byActionPrd    =   HI;
-	channel.byActionCau    =   TG;
-	channel.byActionCad    =   TG;
+	channel.byActionPrd    =   LO;
+	channel.byActionCau    =   HI;
+	channel.byActionCad    =   HI;
 	channel.byActionCbu    =   NA;
 	channel.byActionCbd    =   NA;
 	channel.byActionT1u    =   LO;
@@ -303,9 +303,9 @@ csi_ept_pwmconfig_t tPwmCfg;
 //------------------------------------------------------------------------------------------------------------------------		
 	csi_ept_start(EPT0);//start  timer
 	while(1){	
-		    csi_ept_change_ch_duty(EPT0,EPT_CH_A, 25);		      
+		    csi_ept_change_ch_duty(EPT0,EPT_CH_A, 0);		      
 		    mdelay(200);                        
-		    csi_ept_change_ch_duty(EPT0,EPT_CH_A, 50);	
+		    csi_ept_change_ch_duty(EPT0,EPT_CH_A, 100);	
 		    mdelay(200);	
 	}
 	return iRet;
